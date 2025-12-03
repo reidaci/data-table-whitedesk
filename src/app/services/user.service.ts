@@ -18,7 +18,7 @@ export class UserService {
       .pipe(catchError((error) => this.handleError(error)));
   }
 
-  private handleError(error: HttpErrorResponse): Observable<never> {
+   handleError(error: HttpErrorResponse): Observable<never> {
     let message = 'Ndodhi një gabim! Ju lutem provoni perseri më vone.';
 
     if (error.error instanceof ErrorEvent) {

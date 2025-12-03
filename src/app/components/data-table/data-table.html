@@ -1,1 +1,35 @@
-<p>data-table works!</p>
+<div class="table-container">
+  <h1>User Data Table</h1>
+
+  @if (isLoading()) {
+  <div class="loading">
+    <p>Duke ngarkuar te dhenat...</p>
+  </div>
+  } @if (error() && !isLoading()) {
+  <div class="error">
+    <p>{{ error() }}</p>
+    <button (click)="loadUsers()" class="retry-button">Provo perseri</button>
+  </div>
+  } @if (!isLoading() && !error()) {
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Emri</th>
+          <th>Email</th>
+          <th>Telefoni</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of users(); track user.id) {
+        <tr>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.phone }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
+</div>
