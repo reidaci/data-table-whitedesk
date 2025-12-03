@@ -1,12 +1,13 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user';
 
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './data-table.html',
   styleUrl: './data-table.css',
 })
@@ -14,6 +15,21 @@ export class DataTableComponent implements OnInit {
   users = signal<User[]>([]);
   isLoading = signal<boolean>(true);
   error = signal<string | null>(null);
+  searchTerm = signal<string>('');
+
+ 
+  filteredUsers = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const allUsers = this.users();
+
+    if (term === '') {
+      return allUsers;
+    }
+
+    return allUsers.filter((user) =>
+      user.name.toLowerCase().includes(term) 
+    );
+  });
 
   constructor(private userService: UserService) {}
 
@@ -35,5 +51,9 @@ export class DataTableComponent implements OnInit {
         this.isLoading.set(false);
       },
     });
+  }
+
+  onSearchChange(value: string): void {
+    this.searchTerm.set(value);
   }
 }
