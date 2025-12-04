@@ -42,7 +42,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (user of filteredUsers(); track user) {
+        @for (user of paginatedUsers(); track user.id) {
         <tr>
           <td>{{ user.name }}</td>
           <td>{{ user.email }}</td>
@@ -51,6 +51,21 @@
         }
       </tbody>
     </table>
+
+    <div class="pagination">
+      <button
+        (click)="onPreviousPage()"
+        [disabled]="isPreviousDisabled()"
+        class="pagination-button"
+      >
+        <i class="bi bi-arrow-left"></i> Meparshme
+      </button>
+
+      <span class="pagination-info"> Faqja {{ currentPage() }} nga {{ totalPages() }} </span>
+      <button (click)="onNextPage()" [disabled]="isNextDisabled()" class="pagination-button">
+        Tjetra <i class="bi bi-arrow-right"></i>
+      </button>
+    </div>
   </div>
   } }
 </div>

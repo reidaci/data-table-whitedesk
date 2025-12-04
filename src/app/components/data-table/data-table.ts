@@ -18,12 +18,13 @@ export class DataTableComponent implements OnInit {
   error = signal<string | null>(null);
   searchTerm = signal<string>('');
   sortState = signal<SortState>({ column: null, direction: null });
+  currentPage = signal<number>(1);
+  readonly itemsPerPage = 5;
 
   filteredUsers = computed(() => {
     const term = this.searchTerm().toLowerCase().trim();
     const allUsers = this.users();
     const { column, direction } = this.sortState();
-
     let result = allUsers;
 
     if (term !== '') {
@@ -34,7 +35,6 @@ export class DataTableComponent implements OnInit {
       result = [...result].sort((a, b) => {
         const aValue = String(a[column]).toLowerCase();
         const bValue = String(b[column]).toLowerCase();
-
         const compareResult = aValue.localeCompare(bValue);
         return direction === SortDirection.ASC ? compareResult : -compareResult;
       });
@@ -42,6 +42,20 @@ export class DataTableComponent implements OnInit {
 
     return result;
   });
+
+  totalPages = computed(() => Math.ceil(this.filteredUsers().length / this.itemsPerPage));
+
+  paginatedUsers = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.filteredUsers().slice(startIndex, endIndex);
+  });
+
+  isPreviousDisabled = computed(() => this.currentPage() === 1);
+
+  isNextDisabled = computed(
+    () => this.currentPage() === this.totalPages() || this.totalPages() === 0
+  );
 
   constructor(private userService: UserService) {}
 
@@ -67,6 +81,7 @@ export class DataTableComponent implements OnInit {
 
   onSearchChange(value: string): void {
     this.searchTerm.set(value);
+    this.currentPage.set(1);
   }
 
   onSort(column: SortColumn): void {
@@ -78,6 +93,20 @@ export class DataTableComponent implements OnInit {
       this.sortState.set({ column, direction: newDirection });
     } else {
       this.sortState.set({ column, direction: SortDirection.ASC });
+    }
+
+    this.currentPage.set(1);
+  }
+
+  onPreviousPage(): void {
+    if (this.currentPage() > 1) {
+      this.currentPage.update((page) => page - 1);
+    }
+  }
+
+  onNextPage(): void {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((page) => page + 1);
     }
   }
 
